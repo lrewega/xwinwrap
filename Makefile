@@ -1,22 +1,21 @@
-all: all64 all32
+CFLAGS = -g -O2 -Wall -Wextra
+LDFLAGS =
+LDLIBS = -lX11 -lXext -lXrender
 
-all64:
-	gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -lX11 -lXext -lXrender xwinwrap.c -o xwinwrap
-	-mkdir x86_64
-	mv ./xwinwrap ./x86_64
+prefix = /usr/local
+bindir = $(prefix)/bin
 
-all32:
-	gcc -m32 -Wall -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -lX11 -lXext -lXrender xwinwrap.c -o xwinwrap
-	-mkdir i386
-	mv ./xwinwrap ./i386
+CC = cc
+RM = rm -f
+INSTALL = install
 
-install64:
-	cp x86_64/xwinwrap /usr/bin
+all: xwinwrap
 
-install32:
-	cp i386/xwinwrap /usr/bin
+install: xwinwrap
+	$(INSTALL) -d -m 755 '$(DESTDIR)$(bindir)'
+	$(INSTALL) xwinwrap '$(DESTDIR)$(bindir)'
 
 clean:
-	-rm -rf x86_64/ i386/
+	$(RM) xwinwrap
 
-
+.PHONY: all install clean
