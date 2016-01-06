@@ -169,13 +169,14 @@ sigHandler (int sig)
 usage (void)
 {
     fprintf(stderr, "%s v%s- Modified by Shantanu Goel. Visit http://tech.shantanugoel.com for updates, queries and feature requests\n", NAME, VERSION);
-    fprintf (stderr, "\nUsage: %s [-g {w}x{h}+{x}+{y}] [-ni] [-argb] [-fs] [-s] [-st] [-sp] [-a] "
+    fprintf (stderr, "\nUsage: %s [-g {w}x{h}+{x}+{y}] [-ni] [-argb] [-fdt] [-fs] [-s] [-st] [-sp] [-a] "
             "[-b] [-nf] [-o OPACITY] [-sh SHAPE] [-ov]-- COMMAND ARG1...\n", NAME);
     fprintf (stderr, "Options:\n \
             -g      - Specify Geometry (w=width, h=height, x=x-coord, y=y-coord. ex: -g 640x480+100+100)\n \
             -ni     - Ignore Input\n \
             -d      - Desktop Window Hack. Provide name of the \"Desktop\" window as parameter \
             -argb   - RGB\n \
+            -fdt    - force WID window a desktop type window\n \
             -fs     - Full Screen\n \
             -s      - Sticky\n \
             -st     - Skip Taskbar\n \
@@ -252,6 +253,7 @@ main (int argc, char **argv)
     int		    fullscreen = 0;
     int		    noInput = 0;
     int		    noFocus = 0;
+    int         set_desktop_type = 0;
     Atom	    state[256];
     int		    nState = 0;
     int         override = 0;
@@ -290,6 +292,10 @@ main (int argc, char **argv)
         else if (strcmp (argv[i], "-argb") == 0)
         {
             argb = 1;
+        }
+        else if (strcmp (argv[i], "-fdt") == 0)
+        {
+            set_desktop_type = 1;
         }
         else if (strcmp (argv[i], "-fs") == 0)
         {
@@ -453,6 +459,15 @@ main (int argc, char **argv)
         XChangeProperty (dpy, win, XInternAtom (dpy, "_NET_WM_STATE", 0),
                 XA_ATOM, 32, PropModeReplace,
                 (unsigned char *) state, nState);
+
+    if (set_desktop_type) {
+        Atom type;
+        type = XInternAtom (dpy, "_NET_WM_WINDOW_TYPE_DESKTOP", 0);
+
+        XChangeProperty (dpy, win, XInternAtom (dpy, "_NET_WM_WINDOW_TYPE", 1),
+                        XA_ATOM, 32, PropModeReplace,
+                        (unsigned char *) &type, 1);
+    }
 
     if (shape)
     {
